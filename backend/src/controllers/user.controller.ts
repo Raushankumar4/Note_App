@@ -1,28 +1,87 @@
 import { Request, Response } from "express";
 import { User } from "../models/user.model";
+import { generateOTP } from "../utils/generateOtp";
+import { sendEmail } from "../mail/sendMail";
+import jwt from "jsonwebtoken";
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
-    const { username, email } = req.body;
-    if (!username || !email) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res
-        .status(409)
-        .json({ message: "User already exists with this email" });
-    }
-    const newUser = await User.create({ username, email });
+    const { email } = req.body;
 
-    return res.status(201).json({
-      message: "User registered successfully",
-      user: { newUser },
-    });
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const otp = generateOTP();
+    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = new User({ email, otp, otpExpiresAt });
+    } else {
+      user.otp = otp;
+      user.otpExpiresAt = otpExpiresAt;
+    }
+
+    await user.save();
+    await sendEmail(email, otp);
+
+    return res.status(200).json({ message: "OTP sent to email" });
   } catch (error) {
-    console.error("Registration Error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    console.error("Error in registerUser:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
+export const verifyOtp = async (req: Request, res: Response) => {
+  try {
+    const { email, otp } = req.body;
+    const user = await User.findOne({ email });
 
+    if (
+      !user ||
+      user.otp !== otp ||
+      new Date(user.otpExpiresAt!) < new Date()
+    ) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    user.otp = undefined;
+    user.otpExpiresAt = undefined;
+    await user.save();
+
+    const token = jwt.sign({ email }, process.env.JWT_SECRET!, {
+      expiresIn: "7d",
+    });
+
+    res.status(200).json({ token });
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const resendOtp = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const otp = generateOTP();
+
+    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mints
+
+    user.otp = otp;
+    user.otpExpiresAt = otpExpiresAt;
+    await user.save();
+
+    await sendEmail(user.email, otp);
+
+    res.status(200).json({ message: "OTP resent successfully" });
+  } catch (error) {
+    console.error("Resend OTP error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

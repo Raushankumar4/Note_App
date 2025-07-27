@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { otpVerification } from "./emailTemplate";
 
 export const sendEmail = async (email: string, otp: string) => {
   const transporter = nodemailer.createTransport({
@@ -13,6 +14,6 @@ export const sendEmail = async (email: string, otp: string) => {
     from: process.env.EMAIL_USER,
     to: email,
     subject: "Your OTP for Note App",
-    text: `Your OTP is ${otp}. It expires in 5 minutes.`,
+    text: otpVerification(email, otp),
   });
 };

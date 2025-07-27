@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { connectToDB } from "./database/connectDb";
 import { ErrorHandler } from "./middleware/errorHandler";
+import userAuthRoutes from "./routes/user.routes";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Basic route
+app.use("/api/v1/user", userAuthRoutes);
 app.get("/", (req: Request, res: Response) => {
   res.send(`Server is Running on :: ${PORT}`);
 });
