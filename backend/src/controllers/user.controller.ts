@@ -8,26 +8,41 @@ export const registerUser = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
+    if (!email || typeof email !== "string") {
+      return res.status(400).json({ message: "Valid email is required" });
     }
 
     const otp = generateOTP();
-    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
     let user = await User.findOne({ email });
 
+    if (user?.authMethod === "google") {
+      return res.status(403).json({
+        message:
+          "This email is registered via Google. Please login with Google.",
+      });
+    }
+
     if (!user) {
-      user = new User({ email, otp, otpExpiresAt });
+      user = new User({
+        email,
+        otp,
+        otpExpiresAt,
+        authMethod: "email",
+      });
     } else {
       user.otp = otp;
       user.otpExpiresAt = otpExpiresAt;
     }
 
     await user.save();
+
     await sendEmail(email, otp);
 
-    return res.status(200).json({ message: "OTP sent to email" });
+    return res
+      .status(200)
+      .json({ message: "OTP has been sent to your email." });
   } catch (error) {
     console.error("Error in registerUser:", error);
     return res.status(500).json({ message: "Internal server error" });

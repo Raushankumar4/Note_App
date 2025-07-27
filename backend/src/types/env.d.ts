@@ -7,5 +7,9 @@ declare namespace NodeJS {
     JWT_EXPIRES: string;
     EMAIL_PASS: string;
     EMAIL_USER: string;
+    SESSION_SECRET: string;
+    BASE_URL: string;
+    GOOGLE_CLIENT_SECRET: string;
+    GOOGLE_CLIENT_ID: string;
   }
 }
