@@ -1,32 +1,45 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import { Request, Response } from "express";
 import { connectToDB } from "./database/connectDb";
+import { ErrorHandler } from "./middleware/errorHandler";
+
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 2000;
 
+// CORS setup
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
-    methods: ["GET", "PSOT", "PUT", "PATCH"],
+    methods: ["GET", "POST", "PUT", "PATCH"],
     credentials: true,
   })
 );
+
+// Middleware
 app.use(express.json());
-app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-const PORT = process.env.PORT || 2000;
-
+// Basic route
 app.get("/", (req: Request, res: Response) => {
-  res.send(`Server is Running on::${PORT}`);
+  res.send(`Server is Running on :: ${PORT}`);
 });
 
-connectToDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server is Running ${PORT}`);
+// Error handler middleware (should be after all routes)
+app.use(ErrorHandler);
+
+// DB and server start
+connectToDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`✅ Server is Running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to connect to database:", error);
+    process.exit(1);
   });
-});
