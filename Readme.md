@@ -2,6 +2,8 @@
 
 A full-stack note-taking app built using the **MERN stack** with dual authentication: **Google Login (OAuth2)** and **OTP via Email**. Users can securely create, view, update, and delete their personal notes.
 
+Link : https://note-app-two-khaki.vercel.app
+
 ---
 
 ## 🚀 Features
