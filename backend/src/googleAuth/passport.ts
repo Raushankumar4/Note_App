@@ -11,7 +11,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      callbackURL: `${process.env.BASE_URL}/api/v1/user/google/callback`,
+      callbackURL: `${process.env.BASE_URL}/api/v1/auth/google/callback`,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -38,9 +38,13 @@ passport.use(
           await user.save();
         }
 
-        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET!, {
-          expiresIn: "7d",
-        });
+        const token = jwt.sign(
+          { id: user?._id, email: user.email },
+          process.env.JWT_SECRET!,
+          {
+            expiresIn: "7d",
+          }
+        );
 
         return done(null, { token });
       } catch (error) {

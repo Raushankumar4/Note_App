@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Note from "../models/notes.model";
+import { AuthenticatedRequest } from "../middleware/auth.middlware";
 
 export const createNote = async (req: Request, res: Response) => {
   try {
@@ -17,9 +18,9 @@ export const createNote = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteNote = async (req: Request, res: Response) => {
+export const deleteNote = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = req.user;
+    const userId = req.user.id;
     const { id } = req.params;
 
     const note = await Note.findOneAndDelete({ _id: id, userId });
@@ -37,9 +38,9 @@ export const deleteNote = async (req: Request, res: Response) => {
   }
 };
 
-export const updateNote = async (req: Request, res: Response) => {
+export const updateNote = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = req.user;
+    const userId = req.user.id;
     const { id } = req.params;
     const { title, content } = req.body;
 
@@ -62,9 +63,9 @@ export const updateNote = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllNotes = async (req: Request, res: Response) => {
+export const getAllNotes = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = req.user;
+    const userId = req.user.id;
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });

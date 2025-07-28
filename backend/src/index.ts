@@ -4,11 +4,13 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
+import "./googleAuth/passport";
 
 import { connectToDB } from "./database/connectDb";
 import { ErrorHandler } from "./middleware/errorHandler";
 import userAuthRoutes from "./routes/user.routes";
 import noteRoutes from "./routes/note.routes";
+import authRoutes from "./routes/google.routes";
 
 dotenv.config();
 
@@ -38,8 +40,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.get("/favicon.ico", (req: Request, res: Response) => {
+  res.status(204).end();
+});
+
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userAuthRoutes);
 app.use("/api/v1/note", noteRoutes);
+
 app.get("/", (req: Request, res: Response) => {
   res.send(`Server is Running on :: ${PORT}`);
 });

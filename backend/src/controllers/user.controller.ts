@@ -1,3 +1,4 @@
+import { AuthenticatedRequest } from "./../middleware/auth.middlware";
 import { Request, Response } from "express";
 import { User } from "../models/user.model";
 import { generateOTP } from "../utils/generateOtp";
@@ -66,9 +67,13 @@ export const verifyOtp = async (req: Request, res: Response) => {
     user.otpExpiresAt = undefined;
     await user.save();
 
-    const token = jwt.sign({ email }, process.env.JWT_SECRET!, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { id: user?._id, email: user.email },
+      process.env.JWT_SECRET!,
+      {
+        expiresIn: "7d",
+      }
+    );
 
     res.status(200).json({ token });
   } catch (error) {
@@ -97,6 +102,31 @@ export const resendOtp = async (req: Request, res: Response) => {
     res.status(200).json({ message: "OTP resent successfully" });
   } catch (error) {
     console.error("Resend OTP error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      name: user.username,
+      email: user.email,
+      avatar: user.avatar,
+    });
+  } catch (error) {
+    console.error("Error while getting profile:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 router.use(authenticate);
-router.route("/register").post(createNote);
+router.route("/create").post(createNote);
 router.route("/notes").get(getAllNotes);
 router.route("/update/:id").put(updateNote);
 router.route("/delete/:id").delete(deleteNote);

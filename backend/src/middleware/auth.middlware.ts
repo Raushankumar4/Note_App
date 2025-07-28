@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
+interface AuthenticatedRequest extends Request {
+  user?: any;
+}
+
 export const authenticate = (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -15,14 +19,14 @@ export const authenticate = (
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-      email: string;
-    };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
 
-    req.user = { email: decoded.email };
-    console.log(req.user);
+    req.user = decoded;
+    console.log("IsAuthenticated", req.user.id);
     next();
   } catch (err) {
     return res.status(401).json({ message: "Invalid token" });
   }
 };
+
+export { AuthenticatedRequest };
