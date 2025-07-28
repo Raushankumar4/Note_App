@@ -72,7 +72,7 @@ function Notes({ refreshTrigger }: NotesProps) {
   const saveEdit = async () => {
     if (!editNote) return;
     try {
-      await api.put(`/note/update/${editNote._id}`, {
+      await api.put(`note/update/${editNote._id}`, {
         title: editNote.title,
         content: editNote.content,
       });

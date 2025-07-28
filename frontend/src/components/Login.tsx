@@ -60,20 +60,20 @@ function Login() {
     try {
       if (isSignIn) {
         const { email } = inputData;
-        const { data } = await api.post("/user/login", { email });
+        const { data } = await api.post("user/login", { email });
         toast.success(data?.message || "Login SuccessFully.");
         localStorage.setItem("token", data?.token);
         navigate("/dashboard");
       } else {
         if (isOtp) {
           const { email, otp } = inputData;
-          const { data } = await api.post("/user/verify-otp", { email, otp });
+          const { data } = await api.post("user/verify-otp", { email, otp });
           localStorage.setItem("token", data?.token);
           toast.success(data?.message || "OTP Verified Successfully");
           navigate("/dashboard");
         } else {
           const { email, username } = inputData;
-          const { data } = await api.post("/user/register", {
+          const { data } = await api.post("user/register", {
             email,
             username,
           });

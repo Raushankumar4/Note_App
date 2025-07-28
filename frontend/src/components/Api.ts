@@ -31,7 +31,7 @@ export default api;
 
 export const getProfile = async () => {
   try {
-    const { data } = await api.get("/user/profile");
+    const { data } = await api.get("user/profile");
     return data;
   } catch (error) {
     console.error("Error fetching profile:", error);
@@ -40,7 +40,7 @@ export const getProfile = async () => {
 };
 export const getNotes = async () => {
   try {
-    const { data } = await api.get("/note/notes");
+    const { data } = await api.get("note/notes");
     return data;
   } catch (error) {
     console.error("Error fetching profile:", error);
@@ -49,7 +49,7 @@ export const getNotes = async () => {
 };
 export const deleteNote = async (id: string) => {
   try {
-    const { data } = await api.delete(`/note/delete/${id}`);
+    const { data } = await api.delete(`note/delete/${id}`);
     return data;
   } catch (error) {
     console.error("Error fetching profile:", error);

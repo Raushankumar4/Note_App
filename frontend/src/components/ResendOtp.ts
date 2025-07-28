@@ -3,7 +3,7 @@ import api from "./Api";
 
 export const ResendOTP = async (email: string) => {
   try {
-    const { data } = await api.put("/user/resend-otp", { email });
+    const { data } = await api.put("user/resend-otp", { email });
     toast.success(data?.message);
     return data;
   } catch (error) {

@@ -95,6 +95,10 @@ export const loginUser = async (req: Request, res: Response) => {
     }
     let user = await User.findOne({ email });
 
+    if (!user) {
+      return res.status(404).json({ message: "User Not Exist" });
+    }
+
     if (user?.authMethod === "google") {
       return res.status(403).json({
         message:
