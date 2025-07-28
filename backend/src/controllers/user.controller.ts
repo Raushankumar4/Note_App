@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
-    const { email } = req.body;
+    const { email, username } = req.body;
 
     if (!email || typeof email !== "string") {
       return res.status(400).json({ message: "Valid email is required" });
@@ -31,6 +31,7 @@ export const registerUser = async (req: Request, res: Response) => {
         otp,
         otpExpiresAt,
         authMethod: "email",
+        username,
       });
     } else {
       user.otp = otp;
@@ -54,7 +55,9 @@ export const verifyOtp = async (req: Request, res: Response) => {
   try {
     const { email, otp } = req.body;
     const user = await User.findOne({ email });
-
+    if (!user) {
+      return res.status(400).json({ message: "No Email Exist Please Signup" });
+    }
     if (
       !user ||
       user.otp !== otp ||
@@ -65,6 +68,7 @@ export const verifyOtp = async (req: Request, res: Response) => {
 
     user.otp = undefined;
     user.otpExpiresAt = undefined;
+    user.isVerified = true;
     await user.save();
 
     const token = jwt.sign(
@@ -75,10 +79,42 @@ export const verifyOtp = async (req: Request, res: Response) => {
       }
     );
 
-    res.status(200).json({ token });
+    res.status(200).json({ message: "Otp Verified", token });
   } catch (error) {
     console.error("Error verifying OTP:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const loginUser = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email || typeof email !== "string") {
+      return res.status(400).json({ message: "Valid email is required" });
+    }
+    let user = await User.findOne({ email });
+
+    if (user?.authMethod === "google") {
+      return res.status(403).json({
+        message:
+          "This email is registered via Google. Please login with Google.",
+      });
+    }
+    if (user?.isVerified === false) {
+      return res.status(401).json({ message: "Please Verify Email" });
+    }
+    const token = jwt.sign(
+      { id: user?._id, email: user?.email },
+      process.env.JWT_SECRET!,
+      {
+        expiresIn: "7d",
+      }
+    );
+    return res.status(200).json({ message: "Login SuccessFully.", token });
+  } catch (error) {
+    console.error("Error in registerUser:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -124,6 +160,7 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
       name: user.username,
       email: user.email,
       avatar: user.avatar,
+      userId,
     });
   } catch (error) {
     console.error("Error while getting profile:", error);

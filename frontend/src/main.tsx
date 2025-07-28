@@ -1,30 +1,42 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import App from "./App";
-import "./index.css";
-import { Notes } from "./components/Notes";
-import Dashboard from "./components/Dashboard";
-import { Login } from "./components/Login";
-import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
+import "./index.css";
+import { Login } from "./components/Login";
+import Loading from "./components/Loading";
+
+const App = lazy(() => import("./App"));
+const Dashboard = lazy(() => import("./components/Dashboard"));
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: (
+      <Suspense fallback={<Loading />}>
+        <App />
+      </Suspense>
+    ),
     children: [
-      { path: "login", element: <Login /> },
-      { path: "dashboard", element: <Dashboard /> },
       {
-        path: "notes",
+        path: "dashboard",
         element: (
-          <ProtectedRoute>
-            <Notes />
-          </ProtectedRoute>
+          <Suspense fallback={<Loading />}>
+            <Dashboard />
+          </Suspense>
         ),
       },
     ],
+  },
+  {
+    index: true,
+    element: (
+      <Suspense
+        fallback={<div className="text-center p-4">Loading Login...</div>}
+      >
+        <Login />
+      </Suspense>
+    ),
   },
 ]);
 

@@ -2,14 +2,14 @@ import { Request, Response } from "express";
 import Note from "../models/notes.model";
 import { AuthenticatedRequest } from "../middleware/auth.middlware";
 
-export const createNote = async (req: Request, res: Response) => {
+export const createNote = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { title, content } = req.body;
     if (!title) return res.status(400).json("Title is required");
     const existedNote = await Note.findOne({ title });
     if (existedNote)
       return res.status(401).json({ message: "Title Must be Unique" });
-    const userId = req.user;
+    const userId = req.user.id;
     const note = await Note.create({ title, content, userId });
     return res.status(201).json({ message: "Note Created", note });
   } catch (error) {

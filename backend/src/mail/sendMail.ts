@@ -14,6 +14,6 @@ export const sendEmail = async (email: string, otp: string) => {
     from: process.env.EMAIL_USER,
     to: email,
     subject: "Your OTP for Note App",
-    text: otpVerification(email, otp),
+    html: otpVerification(email, otp),
   });
 };

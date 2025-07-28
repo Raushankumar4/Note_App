@@ -8,6 +8,7 @@ export interface IUser extends Document {
   authMethod: "email" | "google";
   googleId?: string;
   avatar?: string;
+  isVerified?: boolean;
 }
 
 const UserSchema: Schema = new Schema<IUser>(
@@ -23,6 +24,10 @@ const UserSchema: Schema = new Schema<IUser>(
     },
     googleId: { type: String },
     avatar: { type: String },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
