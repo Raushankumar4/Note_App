@@ -28,8 +28,12 @@ function Login() {
   const validateInput = () => {
     const newError: { [key: string]: string } = {};
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!inputData.email) {
       newError.email = "Email is required";
+    } else if (!emailRegex.test(inputData.email)) {
+      newError.email = "Enter a valid email address";
     }
 
     if (!isSignIn && !inputData.username) {
