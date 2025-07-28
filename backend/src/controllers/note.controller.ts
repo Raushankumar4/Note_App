@@ -63,15 +63,9 @@ export const updateNote = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-export const getAllNotes = async (req: AuthenticatedRequest, res: Response) => {
+export const getAllNotes = async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
-
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const notes = await Note.find({ userId })
+    const notes = await Note.find()
       .populate("userId", "username")
       .sort({ updatedAt: -1 });
 
