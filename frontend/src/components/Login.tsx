@@ -210,16 +210,6 @@ function Login() {
                     text={isSignIn ? "Sign In" : isOtp ? "Sign Up" : "GET OTP"}
                   />
 
-                  <p className="mt-5 text-xs text-gray-600 text-center">
-                    I agree to the {" "}
-                    <a className="border-b border-gray-500 border-dotted cursor-pointer">
-                      Terms of Service
-                    </a>{" "}
-                    and{" "}
-                    <a className="border-b border-gray-500 border-dotted cursor-pointer">
-                      Privacy Policy
-                    </a>
-                  </p>
 
                   <p className="mt-3 text-xs text-center">
                     {isSignIn ? (
