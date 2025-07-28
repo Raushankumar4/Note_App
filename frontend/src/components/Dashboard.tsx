@@ -52,7 +52,7 @@ const Dashboard = () => {
           <img
             src={
               user?.avatar ||
-              "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg"
+              `https://api.dicebear.com/7.x/avataaars/svg?seed=${user}`
             }
             alt="User Avatar"
             className="w-10 h-10 rounded-full"
