@@ -5,18 +5,13 @@ import { Toaster } from "react-hot-toast";
 import "./index.css";
 import { Login } from "./components/Login";
 import Loading from "./components/Loading";
-
-const App = lazy(() => import("./App"));
+import App from "./App";
 const Dashboard = lazy(() => import("./components/Dashboard"));
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <Suspense fallback={<Loading />}>
-        <App />
-      </Suspense>
-    ),
+    element: <App />,
     children: [
       {
         path: "dashboard",
