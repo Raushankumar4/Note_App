@@ -211,7 +211,7 @@ function Login() {
                   />
 
                   <p className="mt-5 text-xs text-gray-600 text-center">
-                    I agree to abide by Templatana's{" "}
+                    I agree to the {" "}
                     <a className="border-b border-gray-500 border-dotted cursor-pointer">
                       Terms of Service
                     </a>{" "}
