@@ -81,6 +81,9 @@ const loginUser = async (req, res) => {
             return res.status(400).json({ message: "Valid email is required" });
         }
         let user = await user_model_1.User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "User Not Exist" });
+        }
         if (user?.authMethod === "google") {
             return res.status(403).json({
                 message: "This email is registered via Google. Please login with Google.",

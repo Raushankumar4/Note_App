@@ -19,7 +19,7 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 2000;
 app.use((0, cors_1.default)({
-    origin: process.env.CLIENT_URL,
+    origin: process.env.CLIENT_URL || "https://note-app-eta.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
 }));
